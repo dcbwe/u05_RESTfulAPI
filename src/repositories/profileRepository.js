@@ -7,7 +7,7 @@ class ProfileRepository extends BaseRepository {
   }
 
   /**
-   * Hitta profil baserat på userId
+   * find profile baserat på userId
    * @param {string} userId
    * @returns {Promise<Object|null>}
    */
@@ -16,7 +16,7 @@ class ProfileRepository extends BaseRepository {
   }
 
   /**
-   * Skapa eller uppdatera profil.
+   * create or update profile
    * @param {string} userId
    * @param {Object} data
    */

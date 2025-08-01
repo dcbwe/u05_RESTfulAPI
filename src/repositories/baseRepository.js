@@ -18,10 +18,10 @@ class BaseRepository {
         return this.model.find();
     }
     /**
-    * Uppdaterar eller skapar ett dokument baserat på filter.
-    * @param {Object} filter   Query­objekt för att hitta dokumentet.
-    * @param {Object} data     Fält att $set:a.
-    * @param {Object} [options] Mongoose-op­tions (upsert, new, setDefaultsOnInsert…).
+    * update or create doc
+    * @param {Object} filter   query­objekt to find doc
+    * @param {Object} data     to $set
+    * @param {Object} [options] mongo-op­tions
     */
     async upsert(filter, data, options = { new: true, upsert: true, setDefaultsOnInsert: true }) {
         return this.model.findOneAndUpdate(

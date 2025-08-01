@@ -1,10 +1,9 @@
-// src/services/profileService.js
 const profileRepository = require('../repositories/profileRepository');
 const { ApiError }      = require('../utils/apiError');
 
 class ProfileService {
     /**
-    * Hämta profil baserat på userId
+    * fetch profile from userId
     * @param {string} userId
     * @returns {Promise<Object>} profile
     */
@@ -14,17 +13,15 @@ class ProfileService {
     }
 
     /**
-    * Skapar eller uppdaterar profildata.
+    * create or update profile
     * @param {string} userId
     * @param {Object} data
     * @returns {Promise<Object>} profile
     */
     async updateOrCreateProfile(userId, data) {
-        // Filtrera tillåtna fält
         const updatable = (({ firstname, lastname, birthYear, gender, city, country }) =>
             ({ firstname, lastname, birthYear, gender, city, country }))(data);
 
-        // Kör upsert – returnerar alltid profilen
         const profile = await profileRepository.upsertByUserId(userId, updatable);
         if (!profile) {
             throw ApiError.internal('Failed to upsert profile');
