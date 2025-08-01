@@ -1,50 +1,52 @@
-/**
- * Handle errors gracefully :D
- */
 class ApiError extends Error {
-    /**
-     * @param {number} status  200, etc..
-     * @param {string} message error message
-     */
-    constructor(status, message) {
+    constructor(status, message, details = null) {
         super(message);
-        this.status = status;
+        this.status  = status;
+        this.details = details;
         Object.setPrototypeOf(this, new.target.prototype);
         Error.captureStackTrace(this);
     }
   
-    /**
-     * 409 factory
-     * @param {string} message
-     */
-    static conflict(message = 'Conflict') {
-        return new ApiError(409, message);
-    }
-  
-    /**
-     * 404 factory
-     * @param {string} message
-     */
-    static notFound(message = 'Not Found') {
-        return new ApiError(404, message);
-    }
-  
-    /**
-     * 400 factory
-     * @param {string} message
-     */
     static badRequest(message = 'Bad Request') {
         return new ApiError(400, message);
     }
+    static validationFailed(errors = []) {
+        return new ApiError(400, 'Validation failed', errors);
+    }  
+    static unauthorized(message = 'Unauthorized') {
+        return new ApiError(401, message);
+    }
+    static forbidden(message = 'Forbidden') {
+        return new ApiError(403, message);
+    }
+    static notFound(message = 'Not Found') {
+        return new ApiError(404, message);
+    }
+    static conflict(message = 'Conflict') {
+        return new ApiError(409, message);
+    }
+    static expired(message = 'Expired') {
+        return new ApiError(410, message);
+    }
+    static internal(message = 'Internal Server Error') {
+        return new ApiError(500, message);
+    }
 }
   
-/**
-* Global error-midware | fallback 500
-*/
 function errorHandler(err, req, res, next) {
-    const status  = err instanceof ApiError ? err.status : 500;
-    const message = err.message || 'Internal Server Error';
-    res.status(status).json({ error: message });
+    const isApiError = err instanceof ApiError;
+    const status     = isApiError ? err.status : 500;
+    const payload    = { error: err.message || 'Internal Server Error' };
+    
+    if (isApiError && err.details) {
+        payload.details = err.details;
+    }
+    
+    if (status >= 500) {
+        console.error(err);
+    }
+    
+    res.status(status).json(payload);
 }
   
 module.exports = { ApiError, errorHandler };

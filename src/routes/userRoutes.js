@@ -1,23 +1,40 @@
-const express      = require('express');
-const router       = express.Router();
+const express = require('express');
+const router = express.Router();
 const userController = require('../controllers/userController');
-const validate = require('../middleware/validate');
-const { registerRules, userIdParam } = require('../validators/userValidator');
+const Validator = require('../validators/validator');
+const auth = require('../middleware/auth');
+const profileRoutes = require('./profileRoutes');
 
-// signup
 router.post(
-    '/',
-    registerRules(),
-    validate,
+    '/signup',
+    Validator.email('email'),
+    Validator.validate,
     userController.register
 );
   
-// get user
+router.post(
+    '/verify',
+    Validator.token('token', { length: 32 }),
+    Validator.password('password', { min: 10, requireSpecial: true }),
+    Validator.validate,
+    userController.verify
+);
+
 router.get(
     '/:userId',
-    userIdParam(),
-    validate,
+    Validator.mongoIdParam('userId'),
+    Validator.validate,
     userController.getById
 );
+
+router.post(
+    '/login',
+    Validator.email('email'),
+    Validator.password('password'),
+    Validator.validate,
+    userController.login
+  );
+
+router.use('/:userId/profile', auth, profileRoutes);
 
 module.exports = router;
