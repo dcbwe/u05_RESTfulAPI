@@ -4,10 +4,13 @@ const userController = require('../controllers/userController');
 const Validator = require('../validators/validator');
 const auth = require('../middleware/auth');
 const profileRoutes = require('./profileRoutes');
+const settingsRoutes = require('./settingsRoutes');
+const detailsRoutes = require('./detailsRoutes');
 
 router.post(
     '/signup',
     Validator.email('email'),
+    Validator.uniqueEmail('email'),
     Validator.validate,
     userController.register
 );
@@ -33,8 +36,18 @@ router.post(
     Validator.password('password'),
     Validator.validate,
     userController.login
+);
+
+router.delete(
+    '/:userId',
+    auth,
+    Validator.mongoIdParam('userId'),
+    Validator.validate,
+    userController.deleteAccount
   );
 
 router.use('/:userId/profile', auth, profileRoutes);
+router.use('/:userId/details', auth, detailsRoutes);
+router.use('/:userId/settings', auth, settingsRoutes);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const express         = require('express');
 const Validator       = require('../validators/validator');
 const profileController = require('../controllers/profileController');
+const { gender } = require('../config/configs');
 
 const router = express.Router({ mergeParams: true });
 
@@ -17,7 +18,7 @@ router.post(
     Validator.string('firstname'),
     Validator.string('lastname'),
     Validator.birthYear('birthYear'),
-    Validator.gender('gender'),
+    Validator.configString('gender', gender),
     Validator.string('city'),
     Validator.string('country'),
     Validator.validate,
@@ -27,10 +28,10 @@ router.post(
 router.put(
     '/',
     Validator.mongoIdParam('userId'),
-    Validator.string('firstname').optional(),  
+    Validator.string('firstname').optional(),
     Validator.string('lastname').optional(),  
     Validator.birthYear('birthYear', { optional: true }),  
-    Validator.gender('gender', { optional: true }),  
+    Validator.configString('gender', gender, { optional: true }),
     Validator.string('city').optional(),  
     Validator.string('country').optional(),
     Validator.validate,

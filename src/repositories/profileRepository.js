@@ -1,13 +1,12 @@
 const BaseRepository = require('./baseRepository');
-const Profile       = require('../models/Profile');
+const Profile = require('../models/Profile');
 
 class ProfileRepository extends BaseRepository {
   constructor() {
     super(Profile);
   }
-
   /**
-   * find profile baserat på userId
+   * find profile from userId
    * @param {string} userId
    * @returns {Promise<Object|null>}
    */

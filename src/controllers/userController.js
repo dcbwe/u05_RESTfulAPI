@@ -1,8 +1,14 @@
 const userService  = require('../services/userService');
 const { toUserDto } = require('../utils/userSerializer');
-const { ApiError } = require('../utils/apiError');
 
 class UserController {
+    /**
+    * POST /users/signup
+    * registers a new user by email and returns the verification token
+    * @param {import('express').Request} req  express request with body { email }
+    * @param {import('express').Response} res  express response
+    * @param {import('express').NextFunction} next express next middleware
+    */
     async register(req, res, next) {
         try {
             const { user, verificationToken } = await userService.register(req.body);
@@ -15,6 +21,13 @@ class UserController {
         }
     }
 
+    /**
+    * POST /users/verify
+    * verifies a user's account using the provided token and sets a password
+    * @param {import('express').Request} req  express request with body { token, password }
+    * @param {import('express').Response} res  express response
+    * @param {import('express').NextFunction} next express next middleware
+    */
     async verify(req, res, next) {
         try {
             const { token, password } = req.body;
@@ -28,6 +41,13 @@ class UserController {
         }
     }
 
+    /**
+    * POST /users/login
+    * authenticates user with email and password and returns a JWT
+    * @param {import('express').Request} req  express request with body { email, password }
+    * @param {import('express').Response} res  express response
+    * @param {import('express').NextFunction} next express next middleware
+    */
     async login(req, res, next) {
         try {
             const { email, password } = req.body;
@@ -40,11 +60,28 @@ class UserController {
         }
     }
 
+    /**
+    * GET /users/:userId
+    * retrieves user's public information by userId
+    * @param {import('express').Request} req  express request with params { userId }
+    * @param {import('express').Response} res  express response
+    * @param {import('express').NextFunction} next express next middleware
+    */
     async getById(req, res, next) {
         try {
             const user = await userService.getById(req.params.userId);
-            if (!user) throw ApiError.notFound('no user found');
             res.json(toUserDto(user));
+        } catch (err) {
+            next(err);
+        }
+    }
+    /**
+    * DELETE /users/:userId
+    */
+    async deleteAccount(req, res, next) {
+        try {
+            await userService.deleteAccount(req.params.userId);
+            res.status(204).send();
         } catch (err) {
             next(err);
         }

@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    match: [/.+@.+\..+/, 'must be valid email']
   },
   password: {
     type: String,
@@ -47,6 +46,29 @@ userSchema.methods.markVerified = function() {
   this.verified = true;
   this.verificationToken = undefined;
   this.verificationTokenExpires = undefined;
+  return this;
+};
+
+/**
+ * validate and register a new email for signup
+ * @param {string} email
+ */
+userSchema.methods.registerEmail = function(email) {
+  const re = /.+@.+\..+/;
+  if (!re.test(email)) throw new Error('Invalid email format');
+  this.email = email.toLowerCase().trim();
+  return this;
+};
+
+/**
+ * pseudonymize the stored email via HMAC, then clear original
+ * @param {string} secret  HMAC secret from env
+ */
+userSchema.methods.pseudonymizeEmail = function(secret) {
+  if (!this.email) return this;
+  const hmac = crypto.createHmac('sha256', secret);
+  const hash = hmac.update(this.email).digest('hex');
+  this.email = hash;
   return this;
 };
 

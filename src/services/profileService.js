@@ -1,14 +1,15 @@
 const profileRepository = require('../repositories/profileRepository');
-const { ApiError }      = require('../utils/apiError');
+const { ApiError } = require('../utils/apiError');
 
 class ProfileService {
     /**
-    * fetch profile from userId
+    * fetch profile on userId
     * @param {string} userId
     * @returns {Promise<Object>} profile
     */
     async getByUserId(userId) {
         const profile = await profileRepository.findByUserId(userId);
+        if (!profile) throw ApiError.notFound('profile not found');
         return profile;
     }
 
@@ -24,7 +25,7 @@ class ProfileService {
 
         const profile = await profileRepository.upsertByUserId(userId, updatable);
         if (!profile) {
-            throw ApiError.internal('Failed to upsert profile');
+            throw ApiError.internal('failed to upsert profile');
         }
         return profile;
     }
