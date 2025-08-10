@@ -21,7 +21,7 @@ The goal is to build a **RESTful API** that represents parts of a **registration
 <summary>resources</summary>
 
  - users
- - profiles
+ - profile
  - details
  - health
  - settings
@@ -96,7 +96,7 @@ The goal is to build a **RESTful API** that represents parts of a **registration
 </details>
 
 <details>
-<summary>single profiles</summary>
+<summary>single profile</summary>
 
 ```json
 {
@@ -105,8 +105,8 @@ The goal is to build a **RESTful API** that represents parts of a **registration
     "userId": "123456789",
     "firstname": "Alice",
     "lastname": "Ali",
-    "age": 29,
-    "sex": "female",
+    "birthYear": 1990,
+    "gender": "female",
     "city": "Oslo",
     "country": "Norway",
     "createdAt": "2025-01-01T00:01:00Z",
@@ -134,7 +134,7 @@ The goal is to build a **RESTful API** that represents parts of a **registration
     "height": 165,
     "weight": 60,
     "dailyRoutine": "Standing and Moving",
-    "training": "2–4 days/week",
+    "trainingLevel": "2–4 days/week",
     "createdAt": "2025-01-01T00:01:00Z",
     "updatedAt": "2025-01-12T08:34:00Z",
     "links": [
@@ -208,14 +208,15 @@ The goal is to build a **RESTful API** that represents parts of a **registration
 <summary>endpoints and methods</summary>
 
 ```plaintext
-/users                     POST 
+/users                     POST
+
 /users/{userId}            GET, DELETE
 
-/users/{userId}/profile    POST, GET, PUT, DELETE
+/users/{userId}/profile    POST, GET, PUT
 
-/users/{userId}/details    POST, GET, PUT, DELETE
+/users/{userId}/details    POST, GET, PUT
 
-/users/{userId}/settings   POST, GET, PUT, DELETE
+/users/{userId}/settings   GET, PUT
 
 /users/{userId}/health     GET 
 ```
