@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const healthController = require('../controllers/healthController');
 const Validator = require('../validators/validator');
 const auth = require('../middleware/auth');
 const profileRoutes = require('./profileRoutes');
@@ -44,7 +45,14 @@ router.delete(
     Validator.mongoIdParam('userId'),
     Validator.validate,
     userController.deleteAccount
-  );
+);
+
+router.get(
+    '/:userId/health',
+    Validator.mongoIdParam('userId'),
+    Validator.validate,
+    healthController.getHealth
+);
 
 router.use('/:userId/profile', auth, profileRoutes);
 router.use('/:userId/details', auth, detailsRoutes);

@@ -1,5 +1,7 @@
 const { body, param, query, header, validationResult } = require('express-validator');
 const { ApiError } = require('../utils/apiError');
+const EmailHasher = require('../utils/emailHasher');
+const userRepository = require('../repositories/userRepository');
 
 class Validator {
     /**
@@ -16,15 +18,13 @@ class Validator {
     static uniqueEmail(field = 'email') {
         return body(field)
             .custom(async (value) => {
-                const email = value.toLowerCase().trim();
-    
-                const hmac     = crypto.createHmac('sha256', process.env.EMAIL_HASH_SECRET);
-                const emailHash = hmac.update(email).digest('hex');
-    
+                const normalized = value.toLowerCase().trim();
+                const emailHash  = EmailHasher.hash(normalized);
+        
                 const existing = await userRepository.model.findOne({
                     $or: [
-                        { email },        // klartext
-                        { emailHash }     // pseudonymiserad
+                        { email: normalized },
+                        { emailHash }
                     ]
                 });
     

@@ -20,16 +20,16 @@ module.exports = {
   trainingLevel: {
     options: [
       '0-1 day/week',
-      '1–2 days/week',
-      '2–4 days/week',
-      '4–6 days/week',
+      '1-2 days/week',
+      '2-4 days/week',
+      '4-6 days/week',
       '7 days/week'
     ],
     values: {
       '0-1 day/week':  0.0,
-      '1–2 days/week': 0.1,
-      '2–4 days/week': 0.2,
-      '4–6 days/week': 0.3,
+      '1-2 days/week': 0.1,
+      '2-4 days/week': 0.2,
+      '4-6 days/week': 0.3,
       '7 days/week':   0.4
     }
   },
@@ -42,7 +42,7 @@ module.exports = {
   },
   activityBase: 1.2,
   units: {
-    options: ['normal', 'us']
+    options: ['standard', 'us']
   },
   language: {
     options: ['en', 'sv']

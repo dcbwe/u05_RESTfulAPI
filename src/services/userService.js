@@ -1,14 +1,14 @@
-const userRepository = require('../repositories/userRepository');
 const tokenService = require('./tokenServiceInstance');
 const passwordService = require('./passwordServiceInstance');
 const { ApiError } = require('../utils/apiError');
 const jwtService = require('./jwtServiceInstance');
 const settingsService = require('./settingsService');
-const mongoose       = require('mongoose');
-const crypto         = require('crypto');
-const profileRepo     = require('../repositories/profileRepository');
-const detailsRepo     = require('../repositories/detailsRepository');
-const settingsRepo    = require('../repositories/settingsRepository');
+const EmailHasher = require('../utils/emailHasher');
+const profileRepository = require('../repositories/profileRepository');
+const userRepository = require('../repositories/userRepository');
+const detailsRepository = require('../repositories/detailsRepository');
+const settingsRepository = require('../repositories/settingsRepository');
+const txManager = require('./transactionManager');
 
 class UserService {
     /**
@@ -83,39 +83,30 @@ class UserService {
 
         return { user, token };
     }
+
     /**
-    * soft-delete user, hard-delete profile, details & settings
-    * @param {string} userId
+    * Soft-delete user + hard delete related data, dispatchar event.
     */
     async deleteAccount(userId) {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-        try {
+        //await txManager.executeWithRetry(async session => {
+        await txManager.execute(async session => {
             const user = await userRepository.findById(userId);
-            if (!user) throw ApiError.notFound('no user');
+            if (!user) throw ApiError.notFound('No user found');
 
-            const normalized = user.email.toLowerCase().trim();
-            const hmac       = crypto.createHmac('sha256', process.env.EMAIL_HASH_SECRET);
-            const hash       = hmac.update(normalized).digest('hex');
-
-            await userRepository.update(
-                userId,
+            const hash = EmailHasher.hash(user.email);
+            await userRepository.update(userId,
                 { active: false, email: undefined, emailHash: hash },
                 { session }
             );
 
-            await profileRepo.deleteByUserId(userId,  { session });
-            await detailsRepo.deleteByUserId(userId,  { session });
-            await settingsRepo.deleteByUserId(userId, { session });
-
-            await session.commitTransaction();
-            session.endSession();
-        } catch (err) {
-            await session.abortTransaction();
-            session.endSession();
-            throw err;
-        }
+            await Promise.all([
+                profileRepository.deleteByUserId(userId, { session }),
+                detailsRepository.deleteByUserId(userId, { session }),
+                settingsRepository.deleteByUserId(userId, { session })
+            ]);
+        });
     }
+
 }
 
 module.exports = new UserService();

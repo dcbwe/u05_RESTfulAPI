@@ -21,7 +21,7 @@ class HealthService {
   getHealth({ weight, height, age, gender, dailyRoutine, trainingLevel }) {
     const a = this.getActivityFactor({ dailyRoutine, trainingLevel });
     const b = this.getBMR({ weight, height, age, gender });
-    const c = this.getCalories(bmr, activityFactor);
+    const c = this.getCalories(b, a);
     return { bmr: b, activityFactor: a, calories: c };
   }
 }
